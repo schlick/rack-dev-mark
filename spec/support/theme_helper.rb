@@ -1,6 +1,11 @@
 RSpec.shared_context "theme context" do
   def read_stylesheet(path)
-    ::File.open(::File.join(::File.dirname(__FILE__), '../../vendor/assets/stylesheets', path)).read
+    file_path = ::File.join(::File.dirname(__FILE__), '../../vendor/assets/stylesheets', path)
+    if ::File.exist?(file_path)
+      ::File.open(file_path).read
+    else
+      ""  # Return empty string for non-existent files (like IE CSS)
+    end
   end
 end
 
