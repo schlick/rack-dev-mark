@@ -17,20 +17,26 @@ module Rack
           title << timestamp if timestamp.to_s != ''
           title = title.join("&#10;")
 
+          # Map old position names to new CSS classes
+          position_class = case position
+          when 'left' then 'left-top'
+          when 'right' then ''  # right-top is the default
+          when 'left-bottom' then 'left-bottom'
+          when 'right-bottom' then 'right-bottom'
+          else 'left-top'
+          end
+
           style_tag_str = <<-EOS
 #{stylesheet_link_tag "github-fork-ribbon-css/gh-fork-ribbon.css"}
-<!--[if lt IE 9]>
-#{stylesheet_link_tag "github-fork-ribbon-css/gh-fork-ribbon.ie.css"}
-<![endif]-->
           EOS
 
-          div_tag_str = <<-EOS
-<div class="github-fork-ribbon-wrapper #{position}#{fixed}" onClick="this.style.display='none'" title="#{title}"><div class="github-fork-ribbon #{color}"><span class="github-fork-ribbon-text">#{env}</span></div></div>
+          ribbon_tag_str = <<-EOS
+<a class="github-fork-ribbon #{position_class}#{fixed} #{color}" data-ribbon="#{env}" title="#{title}" onClick="this.style.display='none'">#{env}</a>
           EOS
 
           html
             .sub(%r{(</head>)}i, "#{style_tag_str.strip}\\1")
-            .sub(%r{(<body[^>]*>)}i, "\\1#{div_tag_str.strip}")
+            .sub(%r{(<body[^>]*>)}i, "\\1#{ribbon_tag_str.strip}")
         end
       end
     end
